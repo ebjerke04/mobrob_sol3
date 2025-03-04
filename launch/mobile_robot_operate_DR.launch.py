@@ -1,0 +1,46 @@
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='mobrob',
+            executable='sensors_raw',
+            name='sensors_raw'
+        ),
+        Node(
+            package='mobrob',
+            executable='sensors_processor',
+            name='sensors_processor'
+        ),
+        Node(
+            package='mobrob',
+            executable='wheel_control',
+            name='wheel_control'
+        ),
+        Node(
+            package='mobrob',
+            executable='set_desired_wheel_speeds',
+            name='set_desired_wheel_speeds'
+        ),
+        
+# "dead_reckoning" node in the namespace "robot_estimate" 
+        Node( 
+            package='mobrob',
+            executable='dead_reckoning',
+            name='dead_reckoning',
+            namespace='robot_estimate'
+        ),
+
+# Then add a "mobile_robot_animator" node for the Estimated state
+# * name it "animator_estimated" and put it in the "robot_estimate" namespace . 
+# * Remap to make it subscribe to "/robot_pose_estimated" instead of "/robot_pose_simulated". 
+        Node( 
+            package='mobrob',
+            executable='mobile_robot_animator',
+            name='animator_estimated',
+            namespace='robot_estimate',
+            remappings=[('/robot_pose_simulated','/robot_pose_estimated')]
+        )
+    ])
+
